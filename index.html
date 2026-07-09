@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fable 5 · The Consulting Operating System</title>
+<style>
+  :root{
+    --paper:#F7F5F1;
+    --panel:#EFEBE3;
+    --panel-deep:#E9E4DB;
+    --ink:#211D1B;
+    --grey:#6E6560;
+    --hairline:#DDD6CC;
+    --crimson:#C10230;
+    --maroon:#8A0224;
+    --tint:rgba(193,2,48,.05);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size:16.5px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .display{ font-family:"Superclarendon","Rockwell","Clarendon Text Pro",Georgia,serif; }
+  .mono{ font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; }
+
+  a{ color:var(--crimson); text-decoration:none; border-bottom:1px solid rgba(193,2,48,.3); }
+  a:hover{ border-bottom-color:var(--crimson); }
+
+  /* ---------- top progress bar (mobile) ---------- */
+  #topbar{ position:fixed; top:0; left:0; right:0; height:3px; z-index:50; }
+  #topbar .fill{ height:100%; width:0%; background:var(--crimson); }
+
+  /* ---------- left rail ---------- */
+  nav#rail{
+    position:fixed; top:0; bottom:0; left:0; width:220px;
+    padding:48px 0 48px 40px;
+    display:flex; flex-direction:column; justify-content:center;
+    z-index:40;
+  }
+  #rail .track{ position:absolute; left:47px; top:12%; bottom:12%; width:1px; background:var(--hairline); }
+  #rail .fill{ position:absolute; left:46.5px; top:12%; width:2px; height:0%; background:var(--crimson); }
+  #rail a{
+    position:relative; display:block;
+    padding:11px 0 11px 28px;
+    font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--grey); border-bottom:none;
+    transition:color .25s ease;
+  }
+  #rail a::before{
+    content:""; position:absolute; left:4px; top:50%; transform:translateY(-50%);
+    width:7px; height:7px; border-radius:50%;
+    background:var(--paper); border:1px solid var(--grey);
+    transition:background .25s ease, border-color .25s ease;
+  }
+  #rail a.active{ color:var(--crimson); }
+  #rail a.active::before{ background:var(--crimson); border-color:var(--crimson); }
+  #rail a.aux{ letter-spacing:.14em; color:var(--grey); opacity:.75; }
+
+  /* ---------- page column ---------- */
+  main{ max-width:780px; margin:0 auto; padding:0 32px 120px; }
+  @media (min-width:1024px){ main{ margin-left:max(260px, calc(50% - 390px)); } }
+  @media (max-width:1023px){ nav#rail{ display:none; } }
+
+  /* ---------- hero ---------- */
+  header.hero{ min-height:78vh; display:flex; flex-direction:column; justify-content:center; padding-top:72px; }
+  .eyebrow{ font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--crimson); font-weight:500; }
+  .rule{ border:0; border-top:1px solid var(--hairline); margin:26px 0; }
+  .hero h1{
+    font-size:clamp(40px, 6.4vw, 68px);
+    line-height:1.05; font-weight:700; letter-spacing:-.01em;
+    text-wrap:balance; margin:22px 0 26px;
+  }
+  .hero h1 em{ font-style:normal; color:var(--crimson); }
+  .hero .thesis{ font-size:19px; line-height:1.6; color:var(--grey); max-width:60ch; }
+  .hero .meta{
+    display:flex; flex-wrap:wrap; gap:8px 32px; margin-top:36px;
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--grey);
+  }
+  .hero .meta .stamp{ color:var(--maroon); }
+
+  /* ---------- generic section ---------- */
+  section.stage{ padding:88px 0 24px; border-top:1px solid var(--hairline); }
+  .stage-head{ display:grid; grid-template-columns:96px 1fr; gap:0 24px; align-items:baseline; margin-bottom:14px; }
+  .stage-num{ font-size:clamp(44px,5.6vw,60px); font-weight:700; color:var(--crimson); line-height:1; font-variant-numeric:tabular-nums; }
+  .stage-label{ font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--grey); margin-bottom:6px; }
+  .stage h2{ font-size:clamp(26px,3.4vw,36px); font-weight:700; line-height:1.15; text-wrap:balance; }
+  .stage .lede{ margin:18px 0 8px; font-size:17px; color:var(--ink); max-width:64ch; }
+  .stage p{ max-width:64ch; }
+  .stage p + p{ margin-top:14px; }
+  @media (max-width:560px){ .stage-head{ grid-template-columns:1fr; gap:8px; } }
+
+  h3.sub{
+    font-size:12px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--maroon); font-weight:600;
+    margin:40px 0 14px; padding-top:18px;
+    border-top:1px solid var(--hairline);
+  }
+
+  /* ---------- executive summary ---------- */
+  .exec{ padding:72px 0 40px; border-top:2px solid var(--ink); }
+  .exec table{ width:100%; border-collapse:collapse; font-size:14.5px; margin-top:20px; }
+  .exec th{
+    text-align:left; font-size:10.5px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--grey); font-weight:500; padding:0 12px 10px 0; border-bottom:1px solid var(--ink);
+  }
+  .exec td{ padding:11px 12px 11px 0; border-bottom:1px solid var(--hairline); vertical-align:top; }
+  .exec td .n{ color:var(--crimson); font-variant-numeric:tabular-nums; font-size:13px; }
+  .exec td a{ font-weight:500; border-bottom:none; color:var(--ink); }
+  .exec td a:hover{ color:var(--crimson); }
+  .exec .stage-col{ white-space:nowrap; color:var(--maroon); font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+  .exec .skills-col{ color:var(--grey); }
+  .table-scroll{ overflow-x:auto; }
+  .exec .kicker{ margin-top:22px; font-size:15px; color:var(--grey); max-width:64ch; }
+
+  /* ---------- skill rows ---------- */
+  .skills{ border-top:1px solid var(--hairline); margin-top:20px; }
+  .skill{ border-bottom:1px solid var(--hairline); cursor:pointer; }
+  .skill .row{ display:grid; grid-template-columns:52px 1fr 20px; gap:16px; align-items:baseline; padding:15px 0; }
+  .skill .idx{ font-size:13px; color:var(--grey); font-variant-numeric:tabular-nums; }
+  .skill .name{ font-size:16.5px; font-weight:500; }
+  .skill .chev{ font-size:13px; color:var(--grey); text-align:right; transition:transform .25s ease, color .25s ease; }
+  .skill .example{ max-height:0; overflow:hidden; opacity:0; transition:max-height .35s ease, opacity .35s ease; }
+  .skill .example p{ margin:0 0 18px 68px; padding-left:16px; border-left:2px solid var(--crimson); font-size:14.5px; color:var(--grey); max-width:56ch; }
+  @media (max-width:560px){ .skill .example p{ margin-left:0; } }
+  .skill:hover .name, .skill.open .name{ color:var(--crimson); }
+  .skill:hover .chev, .skill.open .chev{ color:var(--crimson); }
+  .skill.open .chev{ transform:rotate(90deg); }
+  .skill.open .example{ max-height:260px; opacity:1; }
+  .skill:focus-visible{ outline:2px solid var(--crimson); outline-offset:2px; }
+
+  /* ---------- before / after ---------- */
+  .ba{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--hairline); border:1px solid var(--hairline); margin:16px 0 6px; }
+  @media (max-width:680px){ .ba{ grid-template-columns:1fr; } }
+  .ba > div{ background:var(--panel); padding:18px 20px; }
+  .ba .tag{ display:block; font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; margin-bottom:10px; color:var(--grey); }
+  .ba .with .tag{ color:var(--crimson); }
+  .ba .q{ font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:13px; line-height:1.55; color:var(--ink); white-space:pre-wrap; }
+  .ba .note{ margin-top:12px; font-size:13.5px; color:var(--grey); }
+
+  /* ---------- how-to block ---------- */
+  .howto{
+    margin:16px 0 8px; padding:22px 24px;
+    background:var(--panel); border:1px solid var(--hairline);
+  }
+  .howto .tag{ display:block; font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--crimson); margin-bottom:12px; }
+  .howto p{ font-size:15px; color:var(--ink); max-width:62ch; }
+  .howto p + p, .howto pre + p, .howto p + pre{ margin-top:14px; }
+  .howto ul{ margin:10px 0 0 18px; font-size:15px; }
+  .howto li{ margin-bottom:6px; max-width:60ch; }
+  .howto li::marker{ color:var(--crimson); }
+
+  /* ---------- code blocks ---------- */
+  pre.code{
+    position:relative;
+    background:var(--ink); color:#F1EDE7;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:12.5px; line-height:1.6;
+    padding:18px 20px; overflow-x:auto;
+    margin:14px 0 6px;
+  }
+  pre.code .cm{ color:#9A908B; }
+  pre.code .k{ color:#E8A0B3; }
+  pre.code::-webkit-scrollbar{ height:6px; }
+  pre.code::-webkit-scrollbar-thumb{ background:#4a4340; }
+  .copy{
+    position:absolute; top:10px; right:10px;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+    background:transparent; color:#9A908B; border:1px solid #4a4340;
+    padding:4px 10px; cursor:pointer;
+  }
+  .copy:hover{ color:#F1EDE7; border-color:#9A908B; }
+  .code-cap{ font-size:12.5px; color:var(--grey); margin:6px 0 18px; }
+
+  /* ---------- when-to-use ---------- */
+  .when{
+    margin:20px 0 10px; padding:16px 0 16px 20px;
+    border-left:2px solid var(--crimson);
+    font-size:15px; color:var(--ink); max-width:60ch;
+  }
+  .when strong{ font-weight:600; }
+
+  /* ---------- getting started ---------- */
+  .prereq{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--hairline); border:1px solid var(--hairline); margin:20px 0 8px; }
+  @media (max-width:680px){ .prereq{ grid-template-columns:1fr; } }
+  .prereq > div{ background:var(--panel); padding:18px 20px; }
+  .prereq .t{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--crimson); margin-bottom:8px; }
+  .prereq p{ font-size:14px; color:var(--ink); }
+  .prereq code, .stage code, .exec code{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:.86em; background:var(--panel-deep); padding:1px 5px; color:var(--maroon);
+  }
+  .howto code{ font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:.86em; background:var(--panel-deep); padding:1px 5px; color:var(--maroon); }
+
+  ol.steps{ counter-reset:step; list-style:none; margin-top:16px; }
+  ol.steps > li{ counter-increment:step; position:relative; padding:0 0 22px 52px; }
+  ol.steps > li::before{
+    content:counter(step,decimal-leading-zero);
+    position:absolute; left:0; top:2px;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:13px; color:var(--crimson);
+  }
+  ol.steps > li::after{ content:""; position:absolute; left:14px; top:28px; bottom:6px; width:1px; background:var(--hairline); }
+  ol.steps > li:last-child::after{ display:none; }
+  ol.steps h4{ font-size:16px; font-weight:600; margin-bottom:6px; }
+  ol.steps p{ font-size:15px; color:var(--grey); max-width:60ch; }
+
+  /* ---------- loop / closing ---------- */
+  section#loop{ padding:88px 0 48px; border-top:1px solid var(--hairline); }
+  .diagram-wrap{ display:flex; justify-content:center; padding:20px 0 4px; }
+  .diagram-wrap svg{ max-width:100%; height:auto; }
+  .loop-caption{ text-align:center; font-size:13px; color:var(--grey); max-width:50ch; margin:0 auto 24px; }
+
+  footer.colophon{
+    border-top:1px solid var(--hairline); padding-top:28px;
+    font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--grey);
+    display:flex; flex-wrap:wrap; gap:8px 32px;
+  }
+
+  /* ---------- reveal ---------- */
+  .reveal{ opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.visible{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .reveal{ opacity:1; transform:none; transition:none; }
+    .skill .example{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="topbar"><div class="fill"></div></div>
+
+<nav id="rail" aria-label="Document sections">
+  <div class="track"></div>
+  <div class="fill" id="railfill"></div>
+  <a href="#exec" data-stage="exec" class="aux">Summary</a>
+  <a href="#start" data-stage="start" class="aux">Setup</a>
+  <a href="#s1" data-stage="s1">Diagnose</a>
+  <a href="#s2" data-stage="s2">Map</a>
+  <a href="#s3" data-stage="s3">Choose</a>
+  <a href="#s4" data-stage="s4">Execute</a>
+  <a href="#s5" data-stage="s5">Govern</a>
+  <a href="#s6" data-stage="s6">Communicate</a>
+  <a href="#loop" data-stage="loop" class="aux">The Loop</a>
+</nav>
+
+<main>
+
+  <header class="hero">
+    <p class="eyebrow">Internal Reference · Claude Fable 5 for Consulting</p>
+    <hr class="rule">
+    <h1 class="display">Twenty-one skills.<br><em>One operating system.</em></h1>
+    <p class="thesis">A working reference for running a repeatable six-stage consulting method on <a href="https://www.anthropic.com/news/claude-fable-5-mythos-5">Claude Fable 5</a> through Claude Code. Each skill is a file you install once and invoke as a command. This document covers what each skill produces, when to reach for it, and the exact setup — assuming you've used ChatGPT but not Claude Code.</p>
+    <div class="meta mono">
+      <span>July 2026</span>
+      <span>v2 — Working reference</span>
+      <span class="stamp">Internal — do not distribute externally</span>
+    </div>
+  </header>
+
+  <!-- ============ EXECUTIVE SUMMARY ============ -->
+  <section class="exec reveal" id="exec">
+    <p class="eyebrow">Executive summary</p>
+    <h2 class="display" style="font-size:clamp(24px,3vw,32px); margin-top:14px;">The system in thirty seconds</h2>
+    <p style="margin-top:16px; color:var(--grey); max-width:64ch;">Every engagement runs the same six stages in order: <strong style="color:var(--ink)">Diagnose → Map → Choose → Execute → Govern → Communicate</strong>. Each stage has 3–4 skills — packaged methods with a fixed output format — installed as files in Claude Code and invoked either automatically or by typing <code>/skill-name</code>. Stage six feeds back into stage one: the board's decision becomes the next engagement's starting condition.</p>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>#</th><th>Stage</th><th>Category</th><th>Skills</th><th>Output</th></tr></thead>
+      <tbody>
+        <tr><td class="n mono">01</td><td class="stage-col">Diagnose</td><td><a href="#s1">Problem framing</a></td><td class="skills-col">Situation assessment · Growth barriers · Assumption audit</td><td class="skills-col">A problem statement that survives evidence</td></tr>
+        <tr><td class="n mono">02</td><td class="stage-col">Map</td><td><a href="#s2">Market &amp; competitive intelligence</a></td><td class="skills-col">Market mapping · Competitive intel · Segmentation · Profit pools</td><td class="skills-col">Where value sits and where the white space is</td></tr>
+        <tr><td class="n mono">03</td><td class="stage-col">Choose</td><td><a href="#s3">Strategic choice</a></td><td class="skills-col">Strategic options · Pricing · Business case · Portfolio review</td><td class="skills-col">A recommendation with its alternatives still visible</td></tr>
+        <tr><td class="n mono">04</td><td class="stage-col">Execute</td><td><a href="#s4">Execution</a></td><td class="skills-col">Operating model · Prioritization · Transformation roadmap</td><td class="skills-col">Owners, decision rights, phases, first 90 days</td></tr>
+        <tr><td class="n mono">05</td><td class="stage-col">Govern</td><td><a href="#s5">Risk &amp; value governance</a></td><td class="skills-col">War-gaming · Risk mitigation · KPI architecture · Value realization</td><td class="skills-col">Tripwires and a scorecard, built before launch</td></tr>
+        <tr><td class="n mono">06</td><td class="stage-col">Communicate</td><td><a href="#s6">Executive communication</a></td><td class="skills-col">Stakeholder alignment · Narrative builder · Decision memo</td><td class="skills-col">A Pyramid-Principle story the board can act on</td></tr>
+        <tr><td class="n mono">07</td><td class="stage-col">—</td><td><a href="#loop">The operating system</a></td><td class="skills-col">The loop itself: shared repo, engagement CLAUDE.md, data connections</td><td class="skills-col">The same backbone, every engagement, every consultant</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="kicker">Mechanically: skills are markdown files (<code>SKILL.md</code>) in <code>~/.claude/skills/</code> or a project's <code>.claude/skills/</code>. Committed to an engagement repo, the whole system transfers to a new team member with <code>git clone</code>. Client data connects through MCP servers. Section 00 below covers setup; sections 01–06 cover the skills; section 07 covers assembly.</p>
+  </section>
+
+  <!-- ============ GETTING STARTED ============ -->
+  <section class="stage reveal" id="start">
+    <div class="stage-head">
+      <div class="stage-num display">00</div>
+      <div>
+        <p class="stage-label">Setup</p>
+        <h2 class="display">Getting started</h2>
+      </div>
+    </div>
+    <p class="lede">Three concepts carry everything in this document: <strong>skills</strong> (procedures Claude loads on demand), <strong>CLAUDE.md</strong> (facts Claude loads every session), and <strong>MCP</strong> (connections to live data). If you know these, the remaining sections are just content.</p>
+
+    <div class="prereq">
+      <div>
+        <p class="t">Skills</p>
+        <p>A folder containing a <code>SKILL.md</code> file: YAML frontmatter that tells Claude when to use it, then markdown instructions. The folder name becomes the command — <code>.claude/skills/decision-memo/SKILL.md</code> creates <code>/decision-memo</code>. Claude also invokes skills on its own when your request matches the description. Slash commands and skills are the same mechanism (<a href="https://code.claude.com/docs/en/skills">docs</a>).</p>
+      </div>
+      <div>
+        <p class="t">CLAUDE.md</p>
+        <p>A markdown file at the project root, loaded into every session automatically. Use it for standing facts: client name, engagement scope, terminology, what's out of bounds. Procedures don't belong here — a skill's body loads only when used, so long method material costs nothing until you need it (<a href="https://code.claude.com/docs/en/memory">docs</a>).</p>
+      </div>
+      <div>
+        <p class="t">MCP</p>
+        <p>The Model Context Protocol connects Claude Code to external systems — databases, drives, issue trackers — so it reads live data instead of what you paste. Servers are added with <code>claude mcp add</code> and authenticated with the <code>/mcp</code> command (<a href="https://code.claude.com/docs/en/mcp">docs</a>).</p>
+      </div>
+    </div>
+
+    <h3 class="sub">Prerequisites</h3>
+    <p>You need a terminal, a Claude subscription or API access, and Claude Code installed:</p>
+    <pre class="code"><span class="cm"># macOS / Linux (native installer)</span>
+curl -fsSL https://claude.ai/install.sh | bash
+
+<span class="cm"># or via npm</span>
+npm install -g @anthropic-ai/claude-code</pre>
+    <p class="code-cap">Then run <code>claude</code> in any folder to start a session. Run <code>/model</code> inside the session and select Fable 5 — the analysis-heavy skills in stages 02–05 benefit from its long-horizon reasoning; routine drafting works fine on Opus or Sonnet.</p>
+
+    <h3 class="sub">Five-minute quickstart</h3>
+    <ol class="steps">
+      <li>
+        <h4>Create one skill folder</h4>
+        <p>Personal skills live in <code>~/.claude/skills/</code> and follow you across projects. Run: <code>mkdir -p ~/.claude/skills/assumption-audit</code></p>
+      </li>
+      <li>
+        <h4>Write the SKILL.md</h4>
+        <p>Save the file below to <code>~/.claude/skills/assumption-audit/SKILL.md</code>. The <code>description</code> is how Claude decides when to load it unprompted; the body is the method it follows.</p>
+      </li>
+      <li>
+        <h4>Invoke it</h4>
+        <p>In a session, type <code>/assumption-audit</code> followed by a strategy statement — or just describe a strategy and ask what has to be true for it to work; Claude loads the skill on its own. Edits to the file take effect live, no restart needed.</p>
+      </li>
+    </ol>
+    <pre class="code"><span class="cm">---</span>
+<span class="k">name:</span> assumption-audit
+<span class="k">description:</span> Audit the implicit assumptions behind a strategy or plan.
+  Use when the user presents a strategy, plan, or business case and asks
+  what could go wrong, what it depends on, or whether it holds up.
+<span class="cm">---</span>
+
+Audit the assumptions behind: $ARGUMENTS
+
+1. List every assumption the strategy silently makes — market, customer,
+   competitor, execution, and financing assumptions separately.
+2. For each: rate the kill-risk (would the strategy fail if this is
+   wrong?) and confidence (what evidence do we actually have?).
+3. Output a table sorted by kill-risk, then name the three cheapest
+   tests that would retire the most risk.
+Do not soften findings. If an assumption is untested, say so.</pre>
+    <p class="code-cap">The <code>$ARGUMENTS</code> placeholder receives whatever you type after the command. That's the entire mechanism — the remaining twenty skills are the same pattern with different methods.</p>
+
+    <div class="howto">
+      <span class="tag">Where skills live — and how the team gets them</span>
+      <p><code>~/.claude/skills/</code> is personal (all your projects). A project's <code>.claude/skills/</code> applies to that project only — and it's a directory you commit to git, which is how the full set reaches other consultants (section 07). Two frontmatter fields matter for control: <code>disable-model-invocation: true</code> means only you can trigger the skill (use for deliverable-builders you want to time), and <code>user-invocable: false</code> means only Claude can (use for background knowledge). Keep each SKILL.md under ~500 lines; move templates and reference material to separate files in the same folder.</p>
+    </div>
+  </section>
+
+  <!-- ============ 01 DIAGNOSE ============ -->
+  <section class="stage reveal" id="s1">
+    <div class="stage-head">
+      <div class="stage-num display">01</div>
+      <div>
+        <p class="stage-label">Stage — Diagnose</p>
+        <h2 class="display">Problem framing</h2>
+      </div>
+    </div>
+    <p class="lede">Engagements fail in week one, not week twelve. The Diagnose skills force the client's question into a testable form before any analysis is commissioned — because the stated problem ("revenue is declining, fix marketing") is usually a symptom, and analyzing a symptom produces a well-evidenced answer to the wrong question.</p>
+    <p>All three skills here are diagnostic reads, not deliverable builders. They run early, they run cheap, and their output is the input to every later stage: the situation assessment sets the fact base, the barrier diagnosis names the constraint the engagement is actually about, and the assumption audit tells you which analyses in stage 02 are worth buying.</p>
+
+    <h3 class="sub">The skills</h3>
+    <div class="skills">
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">01</span><span class="name">Situation assessment</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a one-page fact base before anyone proposes a fix: market position, margin trend, momentum versus peers, and — separately — the client's stated question versus what the numbers suggest the real question is. Ends with the three facts that most constrain the answer.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">02</span><span class="name">Growth barrier diagnosis</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a ranked list of candidate constraints (demand, capacity, capability, capital, competition) with the evidence for and against each — separating the constraint that actually caps growth from the noise that merely surrounds it. Names the single binding constraint and what data would confirm it.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">03</span><span class="name">Assumption audit</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a table of everything the strategy silently assumes, each rated for kill-risk and evidence, plus the three cheapest tests that would retire the most risk. This is the skill built in the quickstart above — the pattern generalizes to the whole library.</p></div>
+      </div>
+    </div>
+
+    <h3 class="sub">Before / after</h3>
+    <div class="ba">
+      <div class="without">
+        <span class="tag">Without the skill</span>
+        <p class="q">Our client's revenue has been declining
+for 6 quarters. Analyze why and suggest
+how to fix it.</p>
+        <p class="note">Claude produces a broad, plausible essay — pricing, churn, competition, macro — with no priority order and no test of whether "declining revenue" is even the right frame.</p>
+      </div>
+      <div class="with">
+        <span class="tag">With /situation-assessment</span>
+        <p class="q">/situation-assessment Client is a $400M
+industrial distributor, revenue -4% for
+6 quarters, EBITDA flat, top competitor
+growing 8%. Board asked us to "fix sales
+effectiveness."</p>
+        <p class="note">The skill forces the format: fact base first, stated-vs-real question flagged (flat EBITDA on falling revenue suggests mix shift, not a sales problem), missing data requested by name before conclusions.</p>
+      </div>
+    </div>
+
+    <div class="when">
+      <strong>Reach for this stage</strong> at kickoff, or any time a request arrives pre-framed as a solution ("we need a pricing study"). <strong>Skip to 02</strong> only when the problem statement has already survived a challenge — if you can't say what evidence would prove the frame wrong, you're not done here.
+    </div>
+
+    <h3 class="sub">How to actually run it</h3>
+    <div class="howto">
+      <span class="tag">Workflow — model-invocable personal skills</span>
+      <p>These three are plain skills with strong <code>description</code> fields, left model-invocable: you want Claude reaching for them uninvited whenever a conversation smells like an unframed problem. No special frontmatter needed beyond the description. Install once in <code>~/.claude/skills/</code>; they then apply to every client folder you open.</p>
+      <p>One upgrade worth making: give <code>situation-assessment</code> live context using dynamic context injection — a <code>!`command`</code> line in the skill body runs <em>before</em> Claude reads the skill, and its output is inlined. If each engagement repo keeps a <code>facts/</code> folder, the skill can pull it automatically:</p>
+      <pre class="code"><span class="cm">## Current engagement fact base</span>
+!`cat facts/*.md 2>/dev/null || echo "No fact base found - ask for one."`</pre>
+      <p class="code-cap">Copy-paste starting prompt:</p>
+      <pre class="code">/situation-assessment [client], [size], [industry]. Board's stated ask:
+"[verbatim ask]". Key numbers: [3-5 metrics with trend]. What is the
+real question, and what data do we need before answering it?</pre>
+    </div>
+  </section>
+
+  <!-- ============ 02 MAP ============ -->
+  <section class="stage reveal" id="s2">
+    <div class="stage-head">
+      <div class="stage-num display">02</div>
+      <div>
+        <p class="stage-label">Stage — Map</p>
+        <h2 class="display">Market &amp; competitive intelligence</h2>
+      </div>
+    </div>
+    <p class="lede">The Map skills turn "summarize the market" into structured intelligence: where value concentrates, how rivals are positioned to move, and which white space is genuinely unclaimed rather than merely unserved. Their common discipline is reconciliation — every sizing is built two ways and the gap is explained, every rival claim is tied to a source.</p>
+    <p>This is the stage where Claude's ability to pull live data matters most, which is why the workflow block below is about tools, not prompts. A market map built from training-data memory is a liability; the same skill grounded in current filings, pricing pages, and your client's own data is a defensible fact base.</p>
+
+    <h3 class="sub">The skills</h3>
+    <div class="skills">
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">04</span><span class="name">Market mapping</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a market sizing built top-down (industry reports, category spend) and bottom-up (customers × frequency × price), reconciles the two, and calls out growth pockets explicitly. The reconciliation gap is reported, not hidden — a 2× gap is itself a finding.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">05</span><span class="name">Competitive intelligence</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a profile per rival — economics, cost position, incentives, recent moves — ending with each one's three most likely next moves and the leading indicators that would confirm them. Sourced claims only; speculation is labeled as such.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">06</span><span class="name">Customer segmentation</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces segments cut by need and willingness to pay — not by the org chart's convenient categories (SMB/mid/enterprise). Each segment gets size, growth, current share, and the one thing that would make it switch.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">07</span><span class="name">Profit pool analysis</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a map of where the industry's profit (not revenue) accumulates along the value chain, where it's migrating, and which step the client occupies. The standard finding: the client is fighting for share in a step whose pool is draining.</p></div>
+      </div>
+    </div>
+
+    <h3 class="sub">Before / after</h3>
+    <div class="ba">
+      <div class="without">
+        <span class="tag">Without the skill</span>
+        <p class="q">Give me an overview of the US
+industrial-fasteners market.</p>
+        <p class="note">A competent Wikipedia-grade summary: size, players, trends. Nothing you couldn't have gotten in one search, and nothing about where the money is.</p>
+      </div>
+      <div class="with">
+        <span class="tag">With /profit-pool</span>
+        <p class="q">/profit-pool US industrial fasteners.
+Client sits at distribution. Search for
+current data - I need the value chain
+from raw steel to end user, margin at
+each step, and where margin is moving.</p>
+        <p class="note">The skill's format forces a chain-step table with margin per step and a migration read — and because the skill grants search access, each number carries a source you can check.</p>
+      </div>
+    </div>
+
+    <div class="when">
+      <strong>Reach for this stage</strong> once Diagnose has fixed the question — Map describes the board; Choose (03) picks the move. Running Map before Diagnose produces beautifully-sourced answers to unvetted questions. If mid-analysis the fact base contradicts the frame, go back to 01; that's the loop working, not a failure.
+    </div>
+
+    <h3 class="sub">How to actually run it</h3>
+    <div class="howto">
+      <span class="tag">Workflow — skills with search access + MCP data sources</span>
+      <p>Two setup moves distinguish this stage. First, grant the skills web access in frontmatter so research doesn't stall on permission prompts — <code>allowed-tools</code> pre-approves listed tools while the skill is active:</p>
+      <pre class="code"><span class="cm">---</span>
+<span class="k">name:</span> competitive-intel
+<span class="k">description:</span> Build a sourced competitive profile with predicted moves.
+  Use for questions about competitors, rivals, or market positioning.
+<span class="k">allowed-tools:</span> WebSearch WebFetch
+<span class="cm">---</span>
+For each competitor in $ARGUMENTS: search for current financials,
+recent strategic moves, and stated priorities. Profile economics and
+incentives, then predict the three most likely next moves with the
+leading indicator for each. Every factual claim carries a source link.</pre>
+      <p>Second, connect client data through MCP so Claude reads it directly instead of you pasting exports. Servers are added once per engagement and shared with the team via the project's <code>.mcp.json</code> (use <code>--scope project</code>):</p>
+      <pre class="code"><span class="cm"># Remote server over HTTP (most hosted connectors)</span>
+claude mcp add --transport http notion https://mcp.notion.com/mcp
+
+<span class="cm"># Local server, e.g. a Postgres bridge to client data</span>
+claude mcp add --scope project --env DATABASE_URL=$CLIENT_DB pg \
+  -- npx -y @modelcontextprotocol/server-postgres
+
+<span class="cm"># Authenticate OAuth servers from inside the session</span>
+/mcp</pre>
+      <p class="code-cap">Browse vetted connectors in the <a href="https://claude.ai/directory">Anthropic directory</a>. Treat MCP servers like any vendor: verify before connecting, especially for engagements under NDA.</p>
+    </div>
+  </section>
+
+  <!-- ============ 03 CHOOSE ============ -->
+  <section class="stage reveal" id="s3">
+    <div class="stage-head">
+      <div class="stage-num display">03</div>
+      <div>
+        <p class="stage-label">Stage — Choose</p>
+        <h2 class="display">Strategic choice</h2>
+      </div>
+    </div>
+    <p class="lede">The Choose skills exist to prevent the most common failure of AI-assisted strategy work: a single confident recommendation with no visible alternatives. Each one compares paths on economics, sensitivities, and risk before recommending — and the rejected options stay in the output, with the reason they lost.</p>
+    <p>These are the most computation-heavy skills in the library. A business case is only as good as its sensitivity analysis, and a portfolio review is only as good as its scoring discipline — which is why the workflow below pins these skills to high effort and ships them with templates, so the model spends its reasoning on the numbers rather than reinventing the format.</p>
+
+    <h3 class="sub">The skills</h3>
+    <div class="skills">
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">08</span><span class="name">Strategic options</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces three to five genuinely distinct paths — not one plan at three price points — each with its core bet, rough economics, the conditions under which it wins, and the earliest signal it's failing. Ends with a recommendation and the explicit reason each alternative lost.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">09</span><span class="name">Pricing strategy</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a price architecture built from willingness-to-pay by segment (stage 02's cut) and expected competitive response — not cost-plus habit. Includes the migration path from current prices and the volume-at-risk math for each step.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">10</span><span class="name">Business case</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces the full case — NPV, payback, IRR — with the three sensitivities that actually swing the answer stated up front, not buried in an appendix. Every input assumption is listed with its source, so the case can be audited line by line.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">11</span><span class="name">Portfolio review</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a scoring of every business unit on market attractiveness and right to win, with explicit invest / hold / exit calls and the capital reallocation they imply. Forced ranking — no unit is allowed to be "strategic" without a number behind it.</p></div>
+      </div>
+    </div>
+
+    <h3 class="sub">Before / after</h3>
+    <div class="ba">
+      <div class="without">
+        <span class="tag">Without the skill</span>
+        <p class="q">Should our client expand into Mexico
+or double down on the US market?
+Build a business case.</p>
+        <p class="note">One spreadsheet-shaped answer, usually favoring whichever option the prompt named first, with sensitivities as an afterthought.</p>
+      </div>
+      <div class="with">
+        <span class="tag">With /business-case</span>
+        <p class="q">/business-case Mexico entry vs US
+densification for [client]. Inputs in
+facts/case-inputs.md. Use 12% WACC,
+5-yr horizon. I want both cases in the
+same template, the three swing
+sensitivities named up front, and the
+break-even value on each.</p>
+        <p class="note">The template forces identical structure for both options, so the comparison is real. Sensitivities lead the output; the recommendation follows the math instead of preceding it.</p>
+      </div>
+    </div>
+
+    <div class="when">
+      <strong>Reach for this stage</strong> when the fact base (02) is stable enough that the options can be priced. <strong>Not before</strong> — an options analysis on a shaky fact base just launders uncertainty into confident-looking NPVs. If two options are within noise of each other, that's a finding: the decision hinges on a belief, and stage 05's war-gaming should test it.
+    </div>
+
+    <h3 class="sub">How to actually run it</h3>
+    <div class="howto">
+      <span class="tag">Workflow — templated skills pinned to high effort</span>
+      <p>Two frontmatter features carry this stage. <code>effort</code> overrides the session's reasoning-depth setting while the skill is active — pin the quantitative skills to <code>xhigh</code> so sensitivity analysis gets full reasoning even when the rest of the session runs lighter. And supporting files keep the SKILL.md short: put the case template in the skill folder and reference it, so the format loads only when the skill runs.</p>
+      <pre class="code"><span class="cm">---</span>
+<span class="k">name:</span> business-case
+<span class="k">description:</span> Build a full investment case with NPV, payback, and
+  named swing sensitivities. Use for invest/divest/enter decisions.
+<span class="k">effort:</span> xhigh
+<span class="k">argument-hint:</span> [decision] [key inputs or file]
+<span class="cm">---</span>
+
+Build the case for: $ARGUMENTS
+
+Follow the structure in [template.md](template.md) exactly.
+Rules: state the 3 swing sensitivities before the recommendation;
+list every input assumption with its source; show the break-even
+value of each swing variable; flag any input you had to invent.</pre>
+      <p class="code-cap">The folder is then <code>business-case/SKILL.md</code> + <code>business-case/template.md</code>. Copy-paste starting prompt:</p>
+      <pre class="code">/strategic-options [client] needs [outcome] within [horizon].
+Constraints: [capital, capability, appetite]. Generate 3-5 distinct
+paths - different bets, not variants of one bet. For each: economics,
+win conditions, earliest failure signal. Then recommend and show why
+the others lost.</pre>
+    </div>
+  </section>
+
+  <!-- ============ 04 EXECUTE ============ -->
+  <section class="stage reveal" id="s4">
+    <div class="stage-head">
+      <div class="stage-num display">04</div>
+      <div>
+        <p class="stage-label">Stage — Execute</p>
+        <h2 class="display">Execution</h2>
+      </div>
+    </div>
+    <p class="lede">The Execute skills convert a chosen direction into things a client organization can actually run: named owners, decision rights, a sequenced initiative list, and a first 90 days specific enough to start Monday. The test for every output here is assignability — if no row of the deliverable maps to a person and a date, it's still strategy, not a plan.</p>
+    <p>Unlike stages 01–03, these skills are configured so <em>only you</em> can trigger them. A roadmap generated because the conversation drifted near the topic is noise; a roadmap generated when the prioritization is settled is the deliverable. The frontmatter flag that enforces this is the main workflow point below.</p>
+
+    <h3 class="sub">The skills</h3>
+    <div class="skills">
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">12</span><span class="name">Operating model design</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces structure, decision rights, and capability requirements derived from the chosen strategy — not inherited from the last reorg. Output is a decision-rights table (who decides, who's consulted, who executes) per critical decision type, plus the capability gaps and how each gets closed: build, buy, or borrow.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">13</span><span class="name">Initiative prioritization</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces the initiative long-list forced through a value-versus-feasibility screen until only a fundable sequence remains. Every cut initiative is listed with its score — so when a sponsor asks why their project died, the answer is a number, not a judgment call.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">14</span><span class="name">Transformation roadmap</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces phases with owners, dependencies, and stage gates — each gate defined as an observable condition, not a date. Opens with a first-90-days section granular enough that week one has named actions.</p></div>
+      </div>
+    </div>
+
+    <h3 class="sub">Before / after</h3>
+    <div class="ba">
+      <div class="without">
+        <span class="tag">Without the skill</span>
+        <p class="q">Create an implementation roadmap
+for the strategy we discussed.</p>
+        <p class="note">Four phases named "Foundation, Build, Scale, Optimize" with no owners, gates measured in quarters, and a Gantt chart nobody will open twice.</p>
+      </div>
+      <div class="with">
+        <span class="tag">With /transformation-roadmap</span>
+        <p class="q">/transformation-roadmap Initiatives and
+scores are in initiatives.csv (already
+prioritized). Org constraints: no new
+hires before Q1, CFO owns any initiative
+touching pricing. Phase by dependency,
+define each gate as an observable
+condition, and make the first 90 days
+week-by-week.</p>
+        <p class="note">The skill inhales the live CSV via dynamic context injection, respects the stated constraints as hard rules, and the 90-day section names owners because the skill's format demands a name per row.</p>
+      </div>
+    </div>
+
+    <div class="when">
+      <strong>Reach for this stage</strong> when stage 03's choice is made and defended — not merely drafted. If trade-offs are still open, a roadmap just hides the unresolved decision inside phase two. <strong>Operating model before roadmap</strong>: sequencing initiatives into an org that can't own them produces a plan that's failed on arrival.
+    </div>
+
+    <h3 class="sub">How to actually run it</h3>
+    <div class="howto">
+      <span class="tag">Workflow — user-triggered skills that pull live working files</span>
+      <p>Set <code>disable-model-invocation: true</code> on all three. This removes the skill from Claude's automatic-trigger pool — it runs only when you type the command, which is what you want for deliverable-builders whose timing matters. Combine with dynamic context injection so the skill reads the current state of the engagement's working files at the moment you invoke it:</p>
+      <pre class="code"><span class="cm">---</span>
+<span class="k">name:</span> transformation-roadmap
+<span class="k">description:</span> Build a phased roadmap with owners, gates, and a
+  week-by-week first 90 days from a prioritized initiative list.
+<span class="k">disable-model-invocation:</span> true
+<span class="k">argument-hint:</span> [constraints]
+<span class="cm">---</span>
+
+<span class="cm">## Current prioritized initiative list</span>
+!`cat initiatives.csv 2>/dev/null || echo "initiatives.csv not found"`
+
+<span class="cm">## Constraints from the consultant</span>
+$ARGUMENTS
+
+Build the roadmap: phases sequenced by dependency, one named owner
+per initiative, each stage gate an observable condition. Open with
+a week-by-week first 90 days. Flag any initiative whose owner or
+dependency is missing from the list rather than inventing one.</pre>
+      <p class="code-cap">The <code>!`cat initiatives.csv`</code> line runs before Claude reads anything, so the roadmap is always built from the file as it exists right now — edit the CSV, re-run the command, get a consistent regeneration.</p>
+    </div>
+  </section>
+
+  <!-- ============ 05 GOVERN ============ -->
+  <section class="stage reveal" id="s5">
+    <div class="stage-head">
+      <div class="stage-num display">05</div>
+      <div>
+        <p class="stage-label">Stage — Govern</p>
+        <h2 class="display">Risk &amp; value governance</h2>
+      </div>
+    </div>
+    <p class="lede">Most strategies aren't wrong — they're unguarded. The Govern skills pressure-test the plan before the market does and instrument it so value capture is visible in quarters, not discovered missing in years. The output standard: every risk has an owner, a trigger, and a pre-agreed response; every board metric traces to a driver a team can move.</p>
+    <p>War-gaming is the technically interesting one. Playing a competitor honestly requires <em>not knowing</em> your side's private reasoning — which maps exactly onto a Claude Code feature: forked subagent contexts that start clean, without your conversation history. The red team genuinely can't peek.</p>
+
+    <h3 class="sub">The skills</h3>
+    <div class="skills">
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">15</span><span class="name">War-gaming</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces each counterparty's best response to your strategy — competitors, regulators, key customers, each played in turn from its own incentives — surfacing the counter-moves the plan hasn't priced in. Output is a move/counter-move tree with the two responses most damaging to the case.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">16</span><span class="name">Risk mitigation</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a risk register where every material risk carries an owner, an observable trigger, and a pre-agreed response — not a heat map that dies in an appendix. Risks without a plausible trigger are challenged as either not material or not yet understood.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">17</span><span class="name">KPI architecture</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a metric tree linking each board-level outcome down through drivers to the operational metrics teams actually control — with the math between levels explicit, so a miss at the top is traceable to a driver in minutes.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">18</span><span class="name">Value realization</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a scorecard tracking captured value against the stage-03 business case, initiative by initiative, so drift shows up in quarters. Includes the leading indicators that predict a miss before the financials show it.</p></div>
+      </div>
+    </div>
+
+    <h3 class="sub">Before / after</h3>
+    <div class="ba">
+      <div class="without">
+        <span class="tag">Without the skill</span>
+        <p class="q">What are the risks to this strategy
+and how would competitors respond?</p>
+        <p class="note">A generic risk list and a competitor response written by the same context that built the strategy — so it politely attacks the strategy's weak points the strategy already defends.</p>
+      </div>
+      <div class="with">
+        <span class="tag">With /war-game</span>
+        <p class="q">/war-game strategy-summary.md
+Counterparties: [Competitor A],
+[Competitor B], [state regulator].
+Play each from its own incentives.
+I want the two most damaging
+responses and what our pre-committed
+counter should be.</p>
+        <p class="note">Each counterparty runs in a fresh forked context that has only the public strategy summary — no access to your private reasoning — so the attacks land where you didn't think to defend.</p>
+      </div>
+    </div>
+
+    <div class="when">
+      <strong>Reach for this stage</strong> after 03 produces a recommendation and before 06 communicates it — a memo that hasn't been war-gamed gets war-gamed live by the board instead. KPI architecture and value realization belong at the <em>start</em> of execution (alongside 04), not after: a scorecard designed post-launch measures what happened to be trackable, not what matters.
+    </div>
+
+    <h3 class="sub">How to actually run it</h3>
+    <div class="howto">
+      <span class="tag">Workflow — forked subagent contexts for honest red-teaming</span>
+      <p>Setting <code>context: fork</code> in frontmatter runs a skill in an isolated subagent: it gets the SKILL.md content as its entire prompt and none of your conversation history. That isolation is the point — the war-game skill passes each counterparty only the public strategy document, so the red team argues from what the market can see:</p>
+      <pre class="code"><span class="cm">---</span>
+<span class="k">name:</span> war-game
+<span class="k">description:</span> Play counterparties against a strategy from their own
+  incentives, in an isolated context with no access to our reasoning.
+<span class="k">context:</span> fork
+<span class="k">disable-model-invocation:</span> true
+<span class="k">argument-hint:</span> [strategy file] [counterparties]
+<span class="cm">---</span>
+
+You are a war-game engine. Input: $ARGUMENTS
+
+For each named counterparty, in turn:
+1. State its objectives, constraints, and incentives from public facts.
+2. Generate its strongest response to the strategy - the move it would
+   actually make, not the move that is convenient for our client.
+3. Score the damage to the strategy's business case (which you cannot
+   see - infer the exposure from the strategy itself).
+Conclude: the two most damaging responses and the pre-commitment that
+would blunt each.</pre>
+      <p class="code-cap">The remaining three skills in this stage are ordinary inline skills — risk-mitigation and kpi-architecture want your full engagement context, so don't fork them. Starting prompt for the scorecard:</p>
+      <pre class="code">/value-realization Track against the case in business-case-v3.md.
+Initiative-level: planned vs captured value, leading indicator per
+initiative, and the earliest date a miss becomes visible. Output as
+a table the PMO can update monthly.</pre>
+    </div>
+  </section>
+
+  <!-- ============ 06 COMMUNICATE ============ -->
+  <section class="stage reveal" id="s6">
+    <div class="stage-head">
+      <div class="stage-num display">06</div>
+      <div>
+        <p class="stage-label">Stage — Communicate</p>
+        <h2 class="display">Executive communication</h2>
+      </div>
+    </div>
+    <p class="lede">Analysis that can't survive a board meeting didn't happen. The Communicate skills convert the preceding five stages into a Pyramid-Principle storyline — answer first, arguments beneath it, evidence at the base — plus the two artifacts around it: a stakeholder plan for getting the decision made, and a one-page memo that makes it official.</p>
+    <p>The hostile-Q&amp;A pass is where these skills earn their keep. Claude drafts the memo, then a separate forked context argues against it as the most skeptical board member — same isolation mechanism as war-gaming, aimed at your own deliverable. Weak joints surface in rehearsal instead of in the room.</p>
+
+    <h3 class="sub">The skills</h3>
+    <div class="skills">
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">19</span><span class="name">Stakeholder alignment</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces a map of who wins, who loses, and who can block — with a sequenced plan for the conversations before the meeting. The standard rule enforced: no decision-maker hears the recommendation for the first time in the room where they must approve it.</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">20</span><span class="name">Narrative builder</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces the storyline before the slides: governing thought at the top, three to four supporting arguments, evidence mapped beneath each. Output is a slide-by-slide skeleton where every header is a claim, not a topic — "Mexico entry returns 2.1× US densification," not "Market Analysis."</p></div>
+      </div>
+      <div class="skill" tabindex="0">
+        <div class="row"><span class="idx mono">21</span><span class="name">Decision memo</span><span class="chev">›</span></div>
+        <div class="example"><p>Produces one page: the recommendation, the cost of waiting, the risks being knowingly accepted, and the signature line. If it doesn't fit on a page, the skill says the thinking isn't done and names what's still unresolved rather than shrinking the font.</p></div>
+      </div>
+    </div>
+
+    <h3 class="sub">Before / after</h3>
+    <div class="ba">
+      <div class="without">
+        <span class="tag">Without the skill</span>
+        <p class="q">Write an executive summary of our
+analysis for the board deck.</p>
+        <p class="note">A faithful chronological recap of the work — methodology first, recommendation on the last slide, exactly backwards for an executive audience.</p>
+      </div>
+      <div class="with">
+        <span class="tag">With /narrative + hostile Q&amp;A</span>
+        <p class="q">/narrative-builder Full analysis in
+findings/. Governing thought: exit the
+retail segment within 18 months.
+Audience: PE board, CFO is skeptical.
+
+<span class="cm">then:</span>
+/hostile-qa Attack the narrative above
+as the skeptical CFO. Ten hardest
+questions, plus which ones we cannot
+currently answer.</p>
+        <p class="note">Answer-first structure by construction, then a clean-context adversary that flags the two questions with no good answer — a week before the CFO finds them.</p>
+      </div>
+    </div>
+
+    <div class="when">
+      <strong>Reach for this stage</strong> last — but reach for <em>stakeholder alignment</em> early, in parallel with 03: the map of who blocks changes which option is even feasible, and learning that after the memo is drafted means redoing 03. The memo itself is always the final artifact; it freezes the decision the other twenty skills built.
+    </div>
+
+    <h3 class="sub">How to actually run it</h3>
+    <div class="howto">
+      <span class="tag">Workflow — template-backed skills, with arguments for the audience</span>
+      <p>These skills live or die on format discipline, so each ships with its template as a supporting file (the stage-03 pattern). The useful extra here is named arguments — declared in frontmatter, they slot into the body by name, which keeps audience and decision separate instead of mashed into one string:</p>
+      <pre class="code"><span class="cm">---</span>
+<span class="k">name:</span> decision-memo
+<span class="k">description:</span> Produce a one-page board decision memo.
+<span class="k">disable-model-invocation:</span> true
+<span class="k">arguments:</span> [decision, audience]
+<span class="k">argument-hint:</span> [decision] [audience]
+<span class="cm">---</span>
+
+Write a one-page decision memo for $audience recommending $decision.
+Structure per [template.md](template.md): recommendation (2 sentences),
+cost of waiting (quantified), risks knowingly accepted (from the
+stage-05 register), decision requested, signature line.
+Hard rule: one page. If it does not fit, the thinking is not done -
+say what is unresolved instead of compressing.</pre>
+      <p class="code-cap">Invoked as <code>/decision-memo "exit retail segment" "PE board"</code> — the quoted strings map to <code>$decision</code> and <code>$audience</code> in order. Since these skills produce client-facing text, keep them user-triggered (<code>disable-model-invocation: true</code>): you decide when a memo exists.</p>
+    </div>
+  </section>
+
+  <!-- ============ 07 THE LOOP ============ -->
+  <section class="stage reveal" id="loop">
+    <div class="stage-head">
+      <div class="stage-num display">07</div>
+      <div>
+        <p class="stage-label">The operating system</p>
+        <h2 class="display">Assembling the system</h2>
+      </div>
+    </div>
+    <p class="lede">The twenty-one skills aren't a menu — they're stations on a loop, and the loop only works if the whole team runs the same one. Three mechanics turn the skill files into an operating system: a shared engagement repo, a CLAUDE.md that carries the client context, and per-engagement data connections.</p>
+
+    <div class="diagram-wrap">
+      <svg id="loopsvg" viewBox="0 0 560 560" role="img" aria-label="Circular diagram of the six-stage engagement loop: Diagnose, Map, Choose, Execute, Govern, Communicate"></svg>
+    </div>
+    <p class="loop-caption">Communicate closes back into Diagnose: the board's decision becomes the next engagement's starting condition.</p>
+
+    <h3 class="sub">The engagement repo</h3>
+    <p>One git repository per engagement, with this shape:</p>
+    <pre class="code">acme-engagement/
+├── CLAUDE.md              <span class="cm"># client facts, scope, terms, boundaries</span>
+├── .claude/
+│   └── skills/            <span class="cm"># all 21 skills - committed, versioned</span>
+│       ├── situation-assessment/SKILL.md
+│       ├── business-case/
+│       │   ├── SKILL.md
+│       │   └── template.md
+│       └── ...
+├── .mcp.json              <span class="cm"># shared data connections (project scope)</span>
+├── facts/                 <span class="cm"># the evolving fact base (stage 01-02)</span>
+├── findings/              <span class="cm"># analysis outputs (stage 02-05)</span>
+└── initiatives.csv        <span class="cm"># working files the skills read live</span></pre>
+    <p class="code-cap">A new team member runs <code>git clone</code> then <code>claude</code>, accepts the workspace trust prompt, and has the identical system: same skills, same templates, same data connections. That trust prompt matters — project skills and <code>.mcp.json</code> servers activate only after you approve the workspace, which is also your review checkpoint for repos you didn't author. Keep firm-level method skills in <code>~/.claude/skills/</code> (or package them as a <a href="https://code.claude.com/docs/en/plugins">plugin</a> for firm-wide distribution); keep client-tuned variants in the repo — where names collide, the more specific level wins.</p>
+
+    <h3 class="sub">CLAUDE.md carries the context between skills</h3>
+    <p>Skills are stateless procedures; CLAUDE.md is the standing memory every one of them reads. Keep it to facts that change rarely and matter always:</p>
+    <pre class="code"># ACME Corp — Retail Exit Engagement
+
+## Client
+$400M industrial distributor, PE-owned (Meridian Capital, 2023).
+Fiscal year ends March. All figures USD unless noted.
+
+## Engagement scope
+Question: exit vs fix the retail segment. Decision meeting: Sept 12.
+Out of scope: management changes, anything touching the union contract.
+
+## Conventions
+- WACC 12% for all cases (agreed with CFO, 2026-06-14)
+- "Retail" = segments 40-49 in the GL, not the storefront business
+- Sensitive: do not cite the Meridian LP letter in client-facing docs</pre>
+    <p class="code-cap">The conventions section is what keeps twenty-one skills consistent — every business case uses the same WACC, every memo respects the same boundaries, without repeating it in every prompt.</p>
+
+    <h3 class="sub">Running a stage end-to-end</h3>
+    <p>A typical stage-03 working session, showing how the pieces chain — each skill's output lands in the repo, and the next skill reads it from there:</p>
+    <pre class="code"><span class="cm"># in the engagement repo</span>
+claude
+
+<span class="cm"># 1. generate the option set from the stage-02 fact base</span>
+/strategic-options Exit vs fix retail. Fact base in facts/,
+constraints in CLAUDE.md. Write output to findings/options-v1.md
+
+<span class="cm"># 2. price the two leading options identically</span>
+/business-case Options 1 and 3 from findings/options-v1.md,
+same template, inputs from facts/case-inputs.md
+
+<span class="cm"># 3. pressure-test before it goes anywhere near a slide</span>
+/war-game findings/options-v1.md Counterparties: [Competitor A],
+[key customer], Meridian's LP base</pre>
+    <p class="code-cap">Nothing here is a special feature — it's the ordinary loop of files in, skills over them, files out. That ordinariness is the point: the method survives staff turnover because it's in the repo, not in anyone's head.</p>
+
+    <div class="howto" style="margin-top:32px;">
+      <span class="tag">Maintaining the system</span>
+      <p>Treat skills like code. When a skill produces a weak output, fix the SKILL.md and commit — the edit takes effect live in-session, and the next consultant inherits the fix. To test changes systematically, the <a href="https://github.com/anthropics/claude-plugins-official/tree/main/plugins/skill-creator">skill-creator plugin</a> (<code>/plugin install skill-creator@claude-plugins-official</code>) runs with-skill versus without-skill comparisons and grades outputs, so a template change is measured rather than vibes-checked. Version the templates hardest — they're the firm's accumulated judgment about what a deliverable looks like, and they compound.</p>
+    </div>
+
+    <footer class="colophon mono" style="margin-top:64px;">
+      <span>Claude Fable 5</span>
+      <span>21 skills · 6 stages · 1 loop</span>
+      <span>2026</span>
+    </footer>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* reveal on scroll */
+  var revealEls = document.querySelectorAll(".reveal");
+  if("IntersectionObserver" in window && !reduced){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add("visible"); io.unobserve(e.target); }
+      });
+    }, { threshold:.08 });
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add("visible"); });
+  }
+
+  /* skill row toggle */
+  document.querySelectorAll(".skill").forEach(function(s){
+    function toggle(){ s.classList.toggle("open"); }
+    s.addEventListener("click", toggle);
+    s.addEventListener("keydown", function(e){
+      if(e.key==="Enter" || e.key===" "){ e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* copy buttons on code blocks */
+  document.querySelectorAll("pre.code").forEach(function(pre){
+    var btn = document.createElement("button");
+    btn.className = "copy"; btn.type = "button"; btn.textContent = "Copy";
+    btn.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      var text = pre.innerText.replace(/^Copy\n?/, "");
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+        .then(function(){ btn.textContent = "Copied"; setTimeout(function(){ btn.textContent = "Copy"; }, 1600); })
+        .catch(function(){ btn.textContent = "Select + ⌘C"; setTimeout(function(){ btn.textContent = "Copy"; }, 1600); });
+    });
+    pre.appendChild(btn);
+  });
+
+  /* progress: rail fill + top bar + active section */
+  var railfill = document.getElementById("railfill");
+  var topfill  = document.querySelector("#topbar .fill");
+  var links = Array.prototype.slice.call(document.querySelectorAll("#rail a"));
+  var ids = ["exec","start","s1","s2","s3","s4","s5","s6","loop"];
+
+  function onScroll(){
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - window.innerHeight;
+    var p = max > 0 ? (window.scrollY / max) : 0;
+    railfill.style.height = (p * 76) + "%";   /* track spans 12%–88% */
+    topfill.style.width = (p * 100) + "%";
+
+    var active = null;
+    ids.forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && el.getBoundingClientRect().top < window.innerHeight * 0.5){ active = id; }
+    });
+    links.forEach(function(a){
+      a.classList.toggle("active", a.getAttribute("data-stage") === active);
+    });
+  }
+  window.addEventListener("scroll", onScroll, { passive:true });
+  onScroll();
+
+  /* loop diagram */
+  var svg = document.getElementById("loopsvg");
+  var NS = "http://www.w3.org/2000/svg";
+  var cx = 280, cy = 280, r = 190;
+  var names = ["Diagnose","Map","Choose","Execute","Govern","Communicate"];
+
+  function tok(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+  function draw(){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    var crimson = tok("--crimson"), grey = tok("--grey"),
+        hairline = tok("--hairline"), ink = tok("--ink"), paper = tok("--paper");
+
+    var ring = document.createElementNS(NS,"circle");
+    ring.setAttribute("cx",cx); ring.setAttribute("cy",cy); ring.setAttribute("r",r);
+    ring.setAttribute("fill","none"); ring.setAttribute("stroke",hairline);
+    ring.setAttribute("stroke-width","1");
+    svg.appendChild(ring);
+
+    var defs = document.createElementNS(NS,"defs");
+    defs.innerHTML = '<marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="'+crimson+'"/></marker>';
+    svg.appendChild(defs);
+
+    names.forEach(function(name, i){
+      var a0 = (i / 6) * Math.PI * 2 - Math.PI / 2;
+      var a1 = ((i + 1) / 6) * Math.PI * 2 - Math.PI / 2;
+      var pad = 0.30;
+      var s = a0 + pad, e = a1 - pad;
+      var x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s);
+      var x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+      var path = document.createElementNS(NS,"path");
+      path.setAttribute("d","M "+x1+" "+y1+" A "+r+" "+r+" 0 0 1 "+x2+" "+y2);
+      path.setAttribute("fill","none");
+      path.setAttribute("stroke",crimson);
+      path.setAttribute("stroke-width","1.5");
+      path.setAttribute("marker-end","url(#arr)");
+      svg.appendChild(path);
+
+      var nx = cx + r * Math.cos(a0), ny = cy + r * Math.sin(a0);
+      var dot = document.createElementNS(NS,"circle");
+      dot.setAttribute("cx",nx); dot.setAttribute("cy",ny); dot.setAttribute("r","5");
+      dot.setAttribute("fill",paper); dot.setAttribute("stroke",crimson);
+      dot.setAttribute("stroke-width","1.5");
+      svg.appendChild(dot);
+
+      var lr = r + 34;
+      var lx = cx + lr * Math.cos(a0), ly = cy + lr * Math.sin(a0);
+      var t = document.createElementNS(NS,"text");
+      t.setAttribute("x",lx); t.setAttribute("y",ly);
+      t.setAttribute("fill",ink);
+      t.setAttribute("font-size","13");
+      t.setAttribute("letter-spacing","2");
+      t.setAttribute("font-family","Helvetica Neue, Helvetica, Arial, sans-serif");
+      t.setAttribute("text-anchor", Math.abs(Math.cos(a0)) < 0.3 ? "middle" : (Math.cos(a0) > 0 ? "start" : "end"));
+      t.setAttribute("dominant-baseline","middle");
+      t.textContent = name.toUpperCase();
+      svg.appendChild(t);
+
+      var ir = r - 26;
+      var ix = cx + ir * Math.cos(a0), iy = cy + ir * Math.sin(a0);
+      var n = document.createElementNS(NS,"text");
+      n.setAttribute("x",ix); n.setAttribute("y",iy);
+      n.setAttribute("fill",grey);
+      n.setAttribute("font-size","11");
+      n.setAttribute("font-family","ui-monospace, SF Mono, Menlo, monospace");
+      n.setAttribute("text-anchor","middle");
+      n.setAttribute("dominant-baseline","middle");
+      n.textContent = "0" + (i + 1);
+      svg.appendChild(n);
+    });
+
+    ["EVERY","ENGAGEMENT"].forEach(function(word, i){
+      var c = document.createElementNS(NS,"text");
+      c.setAttribute("x",cx); c.setAttribute("y",cy - 10 + i * 24);
+      c.setAttribute("fill",crimson);
+      c.setAttribute("font-size","15");
+      c.setAttribute("letter-spacing","3");
+      c.setAttribute("font-family","Helvetica Neue, Helvetica, Arial, sans-serif");
+      c.setAttribute("text-anchor","middle");
+      c.textContent = word;
+      svg.appendChild(c);
+    });
+  }
+
+  draw();
+})();
+</script>
+</body>
+</html>
