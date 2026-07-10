@@ -6,3 +6,4 @@ A single-page working reference for running a repeatable six-stage consulting me
 
 **Live site:** [ethandfang.github.io/Fable-Consulting-OS](https://ethandfang.github.io/Fable-Consulting-OS/)
 
+ 
