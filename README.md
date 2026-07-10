@@ -6,11 +6,3 @@ A single-page working reference for running a repeatable six-stage consulting me
 
 **Live site:** [ethandfang.github.io/Fable-Consulting-OS](https://ethandfang.github.io/Fable-Consulting-OS/)
 
-## Run locally
-
-The whole site is one self-contained `index.html` — no build step, no dependencies.
-
-```sh
-python3 -m http.server 8000
-# open http://localhost:8000
-```
