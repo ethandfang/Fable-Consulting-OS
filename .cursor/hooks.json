@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "stop": [
+      {
+        "command": ".cursor/hooks/publish-pages.sh",
+        "loop_limit": 1
+      }
+    ]
+  }
+}
