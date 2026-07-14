@@ -189,6 +189,32 @@
   }
   .when strong{ font-weight:600; }
 
+  /* ---------- one-paste installer ---------- */
+  details.installer{ margin:18px 0 8px; border:1px solid var(--hairline); background:var(--panel); }
+  details.installer summary{
+    display:grid; grid-template-columns:1fr 20px; gap:16px; align-items:baseline;
+    padding:17px 20px; cursor:pointer; list-style:none;
+  }
+  details.installer summary::-webkit-details-marker{ display:none; }
+  details.installer summary .name{ font-size:16.5px; font-weight:500; }
+  details.installer summary .chev{ font-size:13px; color:var(--grey); text-align:right; transition:transform .25s ease, color .25s ease; }
+  details.installer summary:hover .name, details.installer[open] summary .name{ color:var(--crimson); }
+  details.installer summary:hover .chev, details.installer[open] summary .chev{ color:var(--crimson); }
+  details.installer[open] summary{ border-bottom:1px solid var(--hairline); }
+  details.installer[open] summary .chev{ transform:rotate(90deg); }
+  details.installer summary:focus-visible{ outline:2px solid var(--crimson); outline-offset:2px; }
+  .installer-body{ padding:18px 20px 20px; }
+  .installer-body .actions{ display:flex; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+  .copyall{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    background:var(--crimson); color:#fff; border:1px solid var(--crimson);
+    padding:9px 16px; cursor:pointer;
+  }
+  .copyall:hover{ background:var(--maroon); border-color:var(--maroon); }
+  .installer-note{ font-size:12.5px; color:var(--grey); }
+  details.installer pre.code{ margin:0; max-height:540px; overflow:auto; }
+
   /* ---------- getting started ---------- */
   .prereq{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--hairline); border:1px solid var(--hairline); margin:20px 0 8px; }
   @media (max-width:680px){ .prereq{ grid-template-columns:1fr; } }
@@ -252,6 +278,7 @@
   <a href="#s5" data-stage="s5">Govern</a>
   <a href="#s6" data-stage="s6">Communicate</a>
   <a href="#loop" data-stage="loop" class="aux">The Loop</a>
+  <a href="#install" data-stage="install" class="aux">Install</a>
 </nav>
 
 <main>
@@ -918,6 +945,463 @@ same template, inputs from facts/case-inputs.md
       <p>Treat skills like code. When a skill produces a weak output, fix the SKILL.md and commit — the edit takes effect live in-session, and the next consultant inherits the fix. To test changes systematically, the <a href="https://github.com/anthropics/claude-plugins-official/tree/main/plugins/skill-creator">skill-creator plugin</a> (<code>/plugin install skill-creator@claude-plugins-official</code>) runs with-skill versus without-skill comparisons and grades outputs, so a template change is measured rather than vibes-checked. Version the templates hardest — they're the firm's accumulated judgment about what a deliverable looks like, and they compound.</p>
     </div>
 
+  </section>
+
+  <!-- ============ 08 ONE-PASTE INSTALL ============ -->
+  <section class="stage reveal" id="install">
+    <div class="stage-head">
+      <div class="stage-num display">08</div>
+      <div>
+        <p class="stage-label">Appendix — One-paste install</p>
+        <h2 class="display">The whole library, one paste</h2>
+      </div>
+    </div>
+    <p class="lede">Everything above, packaged as a single prompt. Open the panel, copy the block, paste it into a Claude Code session at the root of an engagement repo — Claude creates <code>.claude/skills/</code> and writes all twenty-one SKILL.md files, and every command in this document is live in that project immediately.</p>
+    <p>Three notes before you paste. It installs at <em>project</em> scope, so commit the resulting <code>.claude/skills/</code> directory and the whole team inherits it (section 07). The templates from stages 03 and 06 are inlined into the skill bodies to keep the paste self-contained — split them into supporting <code>template.md</code> files later if you want them versioned separately. And review what gets written like any code: Claude shows each file as it creates it, and the frontmatter flags (<code>allowed-tools</code>, <code>disable-model-invocation</code>, <code>context: fork</code>, <code>effort</code>) match the stage-by-stage guidance above.</p>
+
+    <details class="installer">
+      <summary><span class="name">Open the install prompt — 21 skills, one paste</span><span class="chev">›</span></summary>
+      <div class="installer-body">
+        <div class="actions">
+          <button type="button" class="copyall" id="copyinstall">Copy the full install prompt</button>
+          <span class="installer-note mono">1 paste · 21 files · project scope</span>
+        </div>
+        <pre class="code nobtn" id="installer-text">Set up the complete 21-skill consulting operating system in this
+project. Below are 21 files, each introduced by a delimiter line of
+the form ===== path =====. For each one: create the folder, then
+write everything between its delimiter and the next delimiter to
+that path, exactly as written - no edits, no reformatting, no
+additions, and no extra files. All paths are relative to the project
+root. If a file already exists at a path, overwrite it. When all 21
+are written, list the files you created and confirm each skill
+responds to its slash command.
+
+<span class="cm">===== .claude/skills/situation-assessment/SKILL.md =====</span>
+---
+name: situation-assessment
+description: Build a one-page fact base before any fix is proposed.
+  Use at kickoff, or whenever a request arrives pre-framed as a
+  solution ("we need a pricing study").
+---
+
+## Current engagement fact base
+!`cat facts/*.md 2>/dev/null || echo "No fact base found - ask for one."`
+
+Assess the situation: $ARGUMENTS
+
+1. Fact base first: market position, margin trend, momentum versus
+   peers - numbers with sources, no interpretation yet.
+2. State the client's stated question, then what the numbers suggest
+   the real question is. Flag any gap between the two.
+3. Name the missing data, by name, that must arrive before any
+   conclusion is drawn.
+Close with the three facts that most constrain the answer.
+One page. Facts before opinions.
+
+<span class="cm">===== .claude/skills/growth-barriers/SKILL.md =====</span>
+---
+name: growth-barriers
+description: Diagnose which constraint actually caps growth. Use when
+  growth has stalled or targets are missed and the cause is disputed.
+---
+
+Diagnose the growth barrier for: $ARGUMENTS
+
+1. Generate candidate constraints across five families: demand,
+   capacity, capability, capital, competition.
+2. For each candidate, list the evidence for and the evidence
+   against. Evidence, not narrative.
+3. Rank the candidates and name the single binding constraint - the
+   one that, relaxed, moves growth. Everything else is noise.
+4. State what data would confirm or kill the top-ranked diagnosis.
+If the evidence cannot separate the top two candidates, say so and
+name the cheapest test that would.
+
+<span class="cm">===== .claude/skills/assumption-audit/SKILL.md =====</span>
+---
+name: assumption-audit
+description: Audit the implicit assumptions behind a strategy or plan.
+  Use when the user presents a strategy, plan, or business case and asks
+  what could go wrong, what it depends on, or whether it holds up.
+---
+
+Audit the assumptions behind: $ARGUMENTS
+
+1. List every assumption the strategy silently makes - market, customer,
+   competitor, execution, and financing assumptions separately.
+2. For each: rate the kill-risk (would the strategy fail if this is
+   wrong?) and confidence (what evidence do we actually have?).
+3. Output a table sorted by kill-risk, then name the three cheapest
+   tests that would retire the most risk.
+Do not soften findings. If an assumption is untested, say so.
+
+<span class="cm">===== .claude/skills/market-map/SKILL.md =====</span>
+---
+name: market-map
+description: Size a market top-down and bottom-up and reconcile the
+  two. Use for market sizing, TAM, or "how big is this" questions.
+allowed-tools: WebSearch WebFetch
+---
+
+Map the market: $ARGUMENTS
+
+1. Top-down: size from industry reports and category spend. Cite
+   every number.
+2. Bottom-up: customers x frequency x price, built from observable
+   inputs.
+3. Reconcile the two. Report the gap and explain it - a 2x gap is a
+   finding, not an embarrassment to hide.
+4. Call out growth pockets explicitly: which sub-segments are
+   growing, at what rate, and why.
+Every sizing carries its source and its year. Flag any number you
+had to estimate.
+
+<span class="cm">===== .claude/skills/competitive-intel/SKILL.md =====</span>
+---
+name: competitive-intel
+description: Build a sourced competitive profile with predicted moves.
+  Use for questions about competitors, rivals, or market positioning.
+allowed-tools: WebSearch WebFetch
+---
+
+For each competitor in $ARGUMENTS: search for current financials,
+recent strategic moves, and stated priorities. Profile economics and
+incentives, then predict the three most likely next moves with the
+leading indicator for each. Every factual claim carries a source link.
+Label speculation as speculation.
+
+<span class="cm">===== .claude/skills/customer-segmentation/SKILL.md =====</span>
+---
+name: customer-segmentation
+description: Segment customers by need and willingness to pay. Use
+  when segments, targeting, or "who is the customer" is the question.
+allowed-tools: WebSearch WebFetch
+---
+
+Segment the customer base: $ARGUMENTS
+
+1. Cut by need and willingness to pay - not by the org chart's
+   convenient categories. SMB/mid/enterprise is a sales structure,
+   not a segmentation.
+2. For each segment: size, growth, the client's current share, and
+   the one thing that would make it switch.
+3. Name the segments the client should not serve, and why.
+Segments must be mutually exclusive and actionable - if two segments
+would receive the same offer, merge them.
+
+<span class="cm">===== .claude/skills/profit-pool/SKILL.md =====</span>
+---
+name: profit-pool
+description: Map where industry profit accumulates along the value
+  chain and where it is migrating. Use for value-chain, margin, or
+  "where is the money" questions.
+allowed-tools: WebSearch WebFetch
+---
+
+Map the profit pool: $ARGUMENTS
+
+1. Lay out the value chain step by step, raw input to end user.
+2. For each step: revenue, margin, and share of total industry
+   profit - profit, not revenue. Sourced.
+3. Show where the pool is migrating and what drives the shift.
+4. Locate the client's step and state the finding plainly -
+   including the standard one: fighting for share in a step whose
+   pool is draining.
+Output a chain-step table, then the migration read in three
+sentences.
+
+<span class="cm">===== .claude/skills/strategic-options/SKILL.md =====</span>
+---
+name: strategic-options
+description: Generate genuinely distinct strategic paths and recommend
+  one with the losers still visible. Use for direction-setting or
+  "what should we do" decisions.
+effort: xhigh
+argument-hint: [outcome sought] [constraints]
+---
+
+Generate the option set for: $ARGUMENTS
+
+1. Produce 3-5 genuinely distinct paths - different bets, not one
+   plan at three price points.
+2. For each: the core bet, rough economics, the conditions under
+   which it wins, and the earliest signal it is failing.
+3. Recommend one. Then state, per rejected option, the explicit
+   reason it lost.
+If two options are within noise of each other, say so - that is a
+finding: the decision hinges on a belief that war-gaming should test.
+
+<span class="cm">===== .claude/skills/pricing-strategy/SKILL.md =====</span>
+---
+name: pricing-strategy
+description: Build a price architecture from willingness to pay and
+  competitive response. Use for pricing, discounting, or monetization
+  decisions.
+effort: xhigh
+argument-hint: [product or segment] [current pricing]
+---
+
+Build the pricing strategy for: $ARGUMENTS
+
+1. Anchor on willingness to pay by segment (use the segmentation
+   from stage 02 if present) - not cost-plus habit.
+2. Model the expected competitive response to each candidate move.
+3. Design the architecture: price points, fences between segments,
+   and the migration path from current prices.
+4. Show the volume-at-risk math for each step of the migration.
+State the revenue at stake if the competitive response is worse
+than modeled.
+
+<span class="cm">===== .claude/skills/business-case/SKILL.md =====</span>
+---
+name: business-case
+description: Build a full investment case with NPV, payback, and
+  named swing sensitivities. Use for invest/divest/enter decisions.
+effort: xhigh
+argument-hint: [decision] [key inputs or file]
+---
+
+Build the case for: $ARGUMENTS
+
+Structure, in this order: the three swing sensitivities; the
+recommendation; NPV, payback, and IRR; the assumption register;
+break-even values.
+Rules: state the 3 swing sensitivities before the recommendation;
+list every input assumption with its source; show the break-even
+value of each swing variable; flag any input you had to invent.
+When comparing options, run every option through this identical
+structure so the comparison is real.
+
+<span class="cm">===== .claude/skills/portfolio-review/SKILL.md =====</span>
+---
+name: portfolio-review
+description: Score every business unit on attractiveness and right to
+  win, with forced invest/hold/exit calls. Use for portfolio, capital
+  allocation, or divestiture reviews.
+effort: xhigh
+argument-hint: [units or file with unit data]
+---
+
+Review the portfolio: $ARGUMENTS
+
+1. Score every unit on market attractiveness and right to win.
+   Show the scoring math.
+2. Force-rank. No unit may be "strategic" without a number behind it.
+3. Call each unit: invest, hold, or exit - and state the capital
+   reallocation the calls imply.
+4. For each exit call, name what would have to be true to reverse it.
+If unit data is missing, list what you need per unit rather than
+scoring on vibes.
+
+<span class="cm">===== .claude/skills/operating-model/SKILL.md =====</span>
+---
+name: operating-model
+description: Derive structure, decision rights, and capability
+  requirements from the chosen strategy.
+disable-model-invocation: true
+argument-hint: [strategy summary or file] [org constraints]
+---
+
+Design the operating model for: $ARGUMENTS
+
+1. Derive requirements from the chosen strategy - not from the
+   last reorg.
+2. Output a decision-rights table per critical decision type: who
+   decides, who is consulted, who executes. Named roles.
+3. List capability gaps and how each gets closed: build, buy, or
+   borrow - with the trigger for choosing.
+Every row must be assignable. If a decision type has no plausible
+owner in the current org, flag it as a design problem, not a
+footnote.
+
+<span class="cm">===== .claude/skills/initiative-prioritization/SKILL.md =====</span>
+---
+name: initiative-prioritization
+description: Force an initiative long-list through a value-versus-
+  feasibility screen to a fundable sequence.
+disable-model-invocation: true
+argument-hint: [capacity constraints]
+---
+
+## Current initiative list
+!`cat initiatives.csv 2>/dev/null || echo "initiatives.csv not found - paste the long-list as arguments."`
+
+## Constraints from the consultant
+$ARGUMENTS
+
+1. Score every initiative on value and feasibility. Show the
+   scoring and keep it consistent across initiatives.
+2. Cut until what remains is a fundable sequence within the stated
+   capacity.
+3. List every cut initiative with its score - when a sponsor asks
+   why their project died, the answer is a number, not a judgment
+   call.
+Output: the funded sequence in order, then the cut list.
+
+<span class="cm">===== .claude/skills/transformation-roadmap/SKILL.md =====</span>
+---
+name: transformation-roadmap
+description: Build a phased roadmap with owners, gates, and a
+  week-by-week first 90 days from a prioritized initiative list.
+disable-model-invocation: true
+argument-hint: [constraints]
+---
+
+## Current prioritized initiative list
+!`cat initiatives.csv 2>/dev/null || echo "initiatives.csv not found"`
+
+## Constraints from the consultant
+$ARGUMENTS
+
+Build the roadmap: phases sequenced by dependency, one named owner
+per initiative, each stage gate an observable condition. Open with
+a week-by-week first 90 days. Flag any initiative whose owner or
+dependency is missing from the list rather than inventing one.
+
+<span class="cm">===== .claude/skills/war-game/SKILL.md =====</span>
+---
+name: war-game
+description: Play counterparties against a strategy from their own
+  incentives, in an isolated context with no access to our reasoning.
+context: fork
+disable-model-invocation: true
+argument-hint: [strategy file] [counterparties]
+---
+
+You are a war-game engine. Input: $ARGUMENTS
+
+For each named counterparty, in turn:
+1. State its objectives, constraints, and incentives from public facts.
+2. Generate its strongest response to the strategy - the move it would
+   actually make, not the move that is convenient for our client.
+3. Score the damage to the strategy's business case (which you cannot
+   see - infer the exposure from the strategy itself).
+Conclude: the two most damaging responses and the pre-commitment that
+would blunt each.
+
+<span class="cm">===== .claude/skills/risk-mitigation/SKILL.md =====</span>
+---
+name: risk-mitigation
+description: Build a risk register where every material risk has an
+  owner, an observable trigger, and a pre-agreed response. Use after
+  a strategy or plan exists and before launch.
+---
+
+Build the risk register for: $ARGUMENTS
+
+For every material risk, three fields, none optional:
+1. An owner - a named role, not a committee.
+2. An observable trigger - the measurable condition that says the
+   risk is materializing.
+3. A pre-agreed response - what the owner does when the trigger
+   fires, decided now, not then.
+Challenge any risk without a plausible trigger: it is either not
+material or not yet understood - say which.
+No heat maps. A register that dies in an appendix is decoration,
+not governance.
+
+<span class="cm">===== .claude/skills/kpi-architecture/SKILL.md =====</span>
+---
+name: kpi-architecture
+description: Build a metric tree linking board outcomes to the
+  operational drivers teams control. Use when designing scorecards,
+  KPIs, or performance management.
+---
+
+Build the KPI architecture for: $ARGUMENTS
+
+1. Start from each board-level outcome and decompose downward
+   through drivers to the operational metrics teams actually
+   control.
+2. Make the math between levels explicit, so a miss at the top is
+   traceable to a driver in minutes.
+3. Per metric: owner, source system, cadence, and current baseline
+   if known.
+Kill vanity metrics: if no team can move it and no decision changes
+when it moves, it leaves the tree.
+
+<span class="cm">===== .claude/skills/value-realization/SKILL.md =====</span>
+---
+name: value-realization
+description: Build a scorecard tracking captured value against the
+  business case, initiative by initiative. Use at the start of
+  execution, not after.
+---
+
+Build the value-realization scorecard for: $ARGUMENTS
+
+1. Track planned versus captured value per initiative, against the
+   stage-03 business case.
+2. Per initiative: a leading indicator that predicts a miss before
+   the financials show it, and the earliest date a miss becomes
+   visible.
+3. Output as a table a PMO can update monthly.
+Drift must show up in quarters, not be discovered missing in years.
+If the business case is not available, stop and ask for it - a
+scorecard without a baseline tracks nothing.
+
+<span class="cm">===== .claude/skills/stakeholder-alignment/SKILL.md =====</span>
+---
+name: stakeholder-alignment
+description: Map who wins, who loses, and who can block a
+  recommendation, with a sequenced conversation plan. Use early, in
+  parallel with strategic choice.
+---
+
+Map the stakeholders for: $ARGUMENTS
+
+1. For each stakeholder: what they win, what they lose, whether
+   they can block, and what they need in order to say yes.
+2. Sequence the conversations before the decision meeting - who is
+   talked to first, by whom, with what ask.
+3. Hard rule: no decision-maker hears the recommendation for the
+   first time in the room where they must approve it.
+Flag any blocker whose objection would change the recommendation
+itself - that goes back to stage 03, not into the meeting plan.
+
+<span class="cm">===== .claude/skills/narrative-builder/SKILL.md =====</span>
+---
+name: narrative-builder
+description: Build a Pyramid-Principle storyline - governing thought,
+  supporting arguments, evidence beneath. Use before any slides exist.
+disable-model-invocation: true
+argument-hint: [governing thought] [audience] [where the analysis lives]
+---
+
+Build the storyline for: $ARGUMENTS
+
+1. Governing thought at the top - one sentence, answer first.
+2. Three to four supporting arguments beneath it; map the evidence
+   under each.
+3. Output a slide-by-slide skeleton where every header is a claim,
+   not a topic: "Mexico entry returns 2.1x US densification," never
+   "Market Analysis."
+4. Note per slide which evidence exists in the findings and which
+   still needs to be produced.
+The storyline is the deliverable; slides come later. If the
+governing thought cannot survive as one sentence, the analysis is
+not done.
+
+<span class="cm">===== .claude/skills/decision-memo/SKILL.md =====</span>
+---
+name: decision-memo
+description: Produce a one-page board decision memo.
+disable-model-invocation: true
+arguments: [decision, audience]
+argument-hint: [decision] [audience]
+---
+
+Write a one-page decision memo for $audience recommending $decision.
+
+Structure, in this order: recommendation (2 sentences), cost of
+waiting (quantified), risks knowingly accepted (from the stage-05
+register), decision requested, signature line.
+Hard rule: one page. If it does not fit, the thinking is not done -
+say what is unresolved instead of compressing.</pre>
+      </div>
+    </details>
+    <p class="code-cap">Prefer a personal install that follows you across projects? Change the first paragraph of the prompt to write into <code>~/.claude/skills/</code> instead of <code>.claude/skills/</code> — everything else is identical.</p>
+
     <footer class="colophon mono" style="margin-top:64px;">
       <span>Claude Fable 5</span>
       <span>21 skills · 6 stages · 1 loop</span>
@@ -954,7 +1438,7 @@ same template, inputs from facts/case-inputs.md
   });
 
   /* copy buttons on code blocks */
-  document.querySelectorAll("pre.code").forEach(function(pre){
+  document.querySelectorAll("pre.code:not(.nobtn)").forEach(function(pre){
     var btn = document.createElement("button");
     btn.className = "copy"; btn.type = "button"; btn.textContent = "Copy";
     btn.addEventListener("click", function(ev){
@@ -967,11 +1451,22 @@ same template, inputs from facts/case-inputs.md
     pre.appendChild(btn);
   });
 
+  /* one-paste installer copy */
+  var installBtn = document.getElementById("copyinstall");
+  if(installBtn){
+    installBtn.addEventListener("click", function(){
+      var text = document.getElementById("installer-text").textContent;
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+        .then(function(){ installBtn.textContent = "Copied — paste into Claude Code"; setTimeout(function(){ installBtn.textContent = "Copy the full install prompt"; }, 2200); })
+        .catch(function(){ installBtn.textContent = "Select the block + ⌘C"; setTimeout(function(){ installBtn.textContent = "Copy the full install prompt"; }, 2200); });
+    });
+  }
+
   /* progress: rail fill + top bar + active section */
   var railfill = document.getElementById("railfill");
   var topfill  = document.querySelector("#topbar .fill");
   var links = Array.prototype.slice.call(document.querySelectorAll("#rail a"));
-  var ids = ["exec","start","s1","s2","s3","s4","s5","s6","loop"];
+  var ids = ["exec","start","s1","s2","s3","s4","s5","s6","loop","install"];
 
   function onScroll(){
     var doc = document.documentElement;
